@@ -1,0 +1,69 @@
+Execute command: [
+  `which`
+  `cmake`
+]
+[/home/vagrant/Labs/lab-11-process]> "which" "cmake"
+/usr/bin/cmake
+Execute command: [
+  `cmake`
+  `--version`
+]
+[/home/vagrant/Labs/lab-11-process]> "cmake" "--version"
+cmake version 3.10.2
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+Execute command: [
+  `cmake`
+  `-H.`
+  `-B/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug`
+  `-DCMAKE_BUILD_TYPE=Debug`
+  `-GUnix Makefiles`
+  `-DCMAKE_TOOLCHAIN_FILE=/home/vagrant/Labs/lab-11-process/tools/polly/gcc-7-cxx17-pic.cmake`
+  `-DCMAKE_EXE_LINKER=-fuse-ld=gold`
+  `-DHUNTER_CONFIGURATION_TYPES=Debug`
+]
+[/home/vagrant/Labs/lab-11-process]> "cmake" "-H." "-B/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug" "-DCMAKE_BUILD_TYPE=Debug" "-GUnix Makefiles" "-DCMAKE_TOOLCHAIN_FILE=/home/vagrant/Labs/lab-11-process/tools/polly/gcc-7-cxx17-pic.cmake" "-DCMAKE_EXE_LINKER=-fuse-ld=gold" "-DHUNTER_CONFIGURATION_TYPES=Debug"
+-- [polly] Used toolchain: gcc 7 / c++17 support / PIC
+-- [hunter] Calculating Toolchain-SHA1
+-- [hunter] Calculating Config-SHA1
+-- [hunter] HUNTER_ROOT: /home/vagrant/.hunter
+-- [hunter] [ Hunter-ID: 70287b1 | Toolchain-ID: fc9dcb2 | Config-ID: dffbc08 ]
+-- [hunter] GTEST_ROOT: /home/vagrant/.hunter/_Base/70287b1/fc9dcb2/dffbc08/Install (ver.: 1.8.0-hunter-p11)
+-- [hunter] BOOSTPROCESS_ROOT: /home/vagrant/.hunter/_Base/70287b1/fc9dcb2/dffbc08/Install (ver.: 0.5)
+-- Boost version: 1.68.0
+-- Found the following Boost libraries:
+--   system
+--   filesystem
+--   iostreams
+-- [hunter] ASYNC++_ROOT: /home/vagrant/.hunter/_Base/70287b1/fc9dcb2/dffbc08/Install (ver.: 0.0.3-hunter)
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug
+Execute command: [
+  `cmake`
+  `--build`
+  `/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug`
+  `--config`
+  `Debug`
+  `--`
+]
+[/home/vagrant/Labs/lab-11-process]> "cmake" "--build" "/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug" "--config" "Debug" "--"
+Scanning dependencies of target builder
+[ 16%] Building CXX object CMakeFiles/builder.dir/sources/builder.cpp.o
+/home/vagrant/Labs/lab-11-process/sources/builder.cpp: In constructor ‘Builder::Builder()’:
+/home/vagrant/Labs/lab-11-process/sources/builder.cpp:14:8: error: ‘cout’ is not a member of ‘std’
+   std::cout << "-> cmake --version" << std::endl;
+        ^~~~
+/home/vagrant/Labs/lab-11-process/sources/builder.cpp:14:8: note: suggested alternative: ‘count’
+   std::cout << "-> cmake --version" << std::endl;
+        ^~~~
+        count
+At global scope:
+cc1plus: error: unrecognized command line option ‘-Wno-unused-command-line-argument’ [-Werror]
+cc1plus: all warnings being treated as errors
+CMakeFiles/builder.dir/build.make:62: recipe for target 'CMakeFiles/builder.dir/sources/builder.cpp.o' failed
+CMakeFiles/Makefile2:67: recipe for target 'CMakeFiles/builder.dir/all' failed
+Makefile:94: recipe for target 'all' failed
+make[2]: *** [CMakeFiles/builder.dir/sources/builder.cpp.o] Error 1
+make[1]: *** [CMakeFiles/builder.dir/all] Error 2
+make: *** [all] Error 2

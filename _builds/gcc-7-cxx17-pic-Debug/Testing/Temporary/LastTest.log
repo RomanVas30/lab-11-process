@@ -1,0 +1,18 @@
+Start testing: Jan 02 18:22 UTC
+----------------------------------------------------------
+1/1 Testing: unit_tests
+1/1 Test: unit_tests
+Command: "/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug/tests"
+Directory: /home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug
+"unit_tests" start time: Jan 02 18:22 UTC
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"unit_tests" end time: Jan 02 18:22 UTC
+"unit_tests" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jan 02 18:22 UTC

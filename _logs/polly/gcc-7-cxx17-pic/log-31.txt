@@ -1,0 +1,76 @@
+Execute command: [
+  `which`
+  `cmake`
+]
+[/home/vagrant/Labs/lab-11-process]> "which" "cmake"
+/usr/bin/cmake
+Execute command: [
+  `cmake`
+  `--version`
+]
+[/home/vagrant/Labs/lab-11-process]> "cmake" "--version"
+cmake version 3.10.2
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+Execute command: [
+  `cmake`
+  `-H.`
+  `-B/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug`
+  `-DCMAKE_BUILD_TYPE=Debug`
+  `-GUnix Makefiles`
+  `-DCMAKE_TOOLCHAIN_FILE=/home/vagrant/Labs/lab-11-process/tools/polly/gcc-7-cxx17-pic.cmake`
+  `-DCMAKE_EXE_LINKER=-fuse-ld=gold`
+  `-DHUNTER_CONFIGURATION_TYPES=Debug`
+]
+[/home/vagrant/Labs/lab-11-process]> "cmake" "-H." "-B/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug" "-DCMAKE_BUILD_TYPE=Debug" "-GUnix Makefiles" "-DCMAKE_TOOLCHAIN_FILE=/home/vagrant/Labs/lab-11-process/tools/polly/gcc-7-cxx17-pic.cmake" "-DCMAKE_EXE_LINKER=-fuse-ld=gold" "-DHUNTER_CONFIGURATION_TYPES=Debug"
+-- [polly] Used toolchain: gcc 7 / c++17 support / PIC
+-- [hunter] Calculating Toolchain-SHA1
+-- [hunter] Calculating Config-SHA1
+-- [hunter] HUNTER_ROOT: /home/vagrant/.hunter
+-- [hunter] [ Hunter-ID: 70287b1 | Toolchain-ID: fc9dcb2 | Config-ID: dffbc08 ]
+-- [hunter] GTEST_ROOT: /home/vagrant/.hunter/_Base/70287b1/fc9dcb2/dffbc08/Install (ver.: 1.8.0-hunter-p11)
+-- [hunter] BOOSTPROCESS_ROOT: /home/vagrant/.hunter/_Base/70287b1/fc9dcb2/dffbc08/Install (ver.: 0.5)
+-- Boost version: 1.68.0
+-- Found the following Boost libraries:
+--   system
+--   filesystem
+--   iostreams
+-- [hunter] ASYNC++_ROOT: /home/vagrant/.hunter/_Base/70287b1/fc9dcb2/dffbc08/Install (ver.: 0.0.3-hunter)
+-- [hunter] BOOST_ROOT: /home/vagrant/.hunter/_Base/70287b1/fc9dcb2/dffbc08/Install (ver.: 1.68.0-p1)
+-- [hunter] BOOST_ROOT: /home/vagrant/.hunter/_Base/70287b1/fc9dcb2/dffbc08/Install (ver.: 1.68.0-p1)
+-- Boost version: 1.68.0
+-- Found the following Boost libraries:
+--   iostreams
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug
+Execute command: [
+  `cmake`
+  `--build`
+  `/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug`
+  `--config`
+  `Debug`
+  `--`
+]
+[/home/vagrant/Labs/lab-11-process]> "cmake" "--build" "/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug" "--config" "Debug" "--"
+Scanning dependencies of target builder
+[ 16%] Building CXX object CMakeFiles/builder.dir/sources/main.cpp.o
+[ 33%] Linking CXX static library libbuilderd.a
+[ 50%] Built target builder
+Scanning dependencies of target tests
+[ 66%] Building CXX object CMakeFiles/tests.dir/sources/main.cpp.o
+[ 83%] Linking CXX executable tests
+[100%] Built target tests
+Execute command: [
+  `ctest`
+  `-C`
+  `Debug`
+]
+[/home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug]> "ctest" "-C" "Debug"
+Test project /home/vagrant/Labs/lab-11-process/_builds/gcc-7-cxx17-pic-Debug
+    Start 1: unit_tests
+1/1 Test #1: unit_tests .......................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.02 sec
