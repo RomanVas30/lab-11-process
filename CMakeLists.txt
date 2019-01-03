@@ -58,7 +58,7 @@ target_link_libraries(builder GTest::main BoostProcess::boost_process Async++::A
 target_link_libraries(process BoostProcess::boost_process Async++::Async++ Boost::iostreams)
 
 enable_testing()
-add_test(NAME unit_tests COMMAND tests)
+add_test(NAME unit_tests COMMAND builder)
 
 if(BUILD_COVERAGE)
   set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
