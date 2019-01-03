@@ -1,2 +1,0 @@
-/usr/bin/ar qc libbuilderd.a  CMakeFiles/builder.dir/sources/builder.cpp.o CMakeFiles/builder.dir/sources/main.cpp.o
-/usr/bin/ranlib libbuilderd.a

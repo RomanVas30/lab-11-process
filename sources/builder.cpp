@@ -14,9 +14,7 @@ using namespace boost::process;
 using namespace boost::process::initializers;
 
 Builder::Builder(){
-  boost::iostreams::file_descriptor_sink sink("stdout.txt");
-  child c = execute(run_exe("cmake"),
-          set_cmd_line("--version"),
-          bind_stdout(sink));
-  auto exit_code = wait_for_exit(c);
+  execute(run_exe("/usr/bin/cmake"),
+          set_cmd_line("/usr/bin/cmake -H. -B_builds -DCMAKE_INSTALL_PREFIX=_install -DCMAKE_BUILD_TYPE=Debug"));
+          //start_in_dir("/home/vagrant/Labs/lab-11-process"));
 }

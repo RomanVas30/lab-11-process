@@ -1,1 +1,0 @@
-/usr/bin/cc      -rdynamic CMakeFiles/cmTC_39514.dir/feature_tests.c.o  -o cmTC_39514 
