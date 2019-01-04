@@ -32,8 +32,8 @@ find_package(BoostProcess CONFIG REQUIRED)
 hunter_add_package(Async++)
 find_package(Async++ CONFIG REQUIRED)
 
-hunter_add_package(Boost COMPONENTS iostreams)
-find_package(Boost CONFIG REQUIRED iostreams)
+hunter_add_package(Boost COMPONENTS iostreams program_options)
+find_package(Boost CONFIG REQUIRED iostreams program_options)
 
 add_library(process STATIC
   ${CMAKE_CURRENT_SOURCE_DIR}/sources/builder.cpp
@@ -53,9 +53,9 @@ target_include_directories(builder
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(builder GTest::main BoostProcess::boost_process Async++::Async++ Boost::iostreams process)
+target_link_libraries(builder GTest::main BoostProcess::boost_process  Boost::program_options Async++::Async++ Boost::iostreams process)
 
-target_link_libraries(process BoostProcess::boost_process Async++::Async++ Boost::iostreams)
+target_link_libraries(process BoostProcess::boost_process Async++::Async++ Boost::program_options Boost::iostreams)
 
 enable_testing()
 add_test(NAME unit_tests COMMAND builder)
