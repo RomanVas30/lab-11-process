@@ -27,7 +27,7 @@ using namespace boost::process;
 using namespace boost::process::initializers;
 namespace po = boost::program_options;
 
-bool Debug(std::vector<std::string>& args){
+bool debug(std::vector<std::string>& args){
       args.push_back("-H.");
       args.push_back("-B_builds");
       args.push_back("-DCMAKE_INSTALL_PREFIX=_install");
@@ -40,8 +40,19 @@ bool Debug(std::vector<std::string>& args){
       return false;
 }
 
+bool build(std::vector<std::string>& args) {
+  args.push_back("--build");
+  args.push_back("_builds");
+  auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-pro$
+  auto exit_code = wait_for_exit(child);
+  std::cout << "exit process with code: " << exit_code << std::endl;
+  if (exit_code == 0)
+        return true;
+      return false;
+}
+
 int main(int argc, char* argv[]){
- // try {
+  try {
     po::options_description desc("Allowed options:");
     desc.add_options()("help", ": выводим вспомогательное сообщение")(
       "config", po::value<std::string>(), ": указываем конфигурацию сборки (по умолчанию Debug)")(
@@ -62,15 +73,11 @@ int main(int argc, char* argv[]){
     std::vector<std::string> args;
     if ((!vm.count("config")) && (!vm.count("install")) && (!vm.count("pack")) && (!vm.count("timeout"))) {
       args.push_back(exe_path);
-      bool valid = Debug(args);
+      bool valid = debug(args);
       if (valid){
         args.clear();
         args.push_back(exe_path);
-        args.push_back("--build");
-        args.push_back("_builds");
-        auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
-        auto exit_code = wait_for_exit(child);
-        std::cout << "exit process with code: " << exit_code << std::endl;
+        build(args);
       }
       return 0;
     }
@@ -89,11 +96,7 @@ int main(int argc, char* argv[]){
         if (exit_code == 0){
           args.clear();
           args.push_back(exe_path);
-          args.push_back("--build");
-          args.push_back("_builds");
-          child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
-          exit_code = wait_for_exit(child);
-          std::cout << "exit process with code: " << exit_code << std::endl;
+          build(args);
         }
         return 0;
       }
@@ -111,13 +114,9 @@ int main(int argc, char* argv[]){
       if (exit_code == 0){
         args.clear();
         args.push_back(exe_path);
-        args.push_back("--build");
-        args.push_back("_builds");
-        child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
-        exit_code = wait_for_exit(child);
-        std::cout << "exit process with code: " << exit_code << std::endl;
+        bool valid = build(args);
       }
-      if (exit_code == 0) {
+      if (valid) {
         args.clear();
         args.push_back(exe_path);
         args.push_back("--build");
@@ -130,9 +129,8 @@ int main(int argc, char* argv[]){
       }
       return 0;
     }
- // }
- // catch (std::exception& e) {
-    //e.what();
-   // std::cout << "Invalid arguments!" << std::endl;
- // }
+  }
+  catch (std::exception& e) {
+    std::cout << "Error: " << e.what() << std::endl;
+  }
 }
