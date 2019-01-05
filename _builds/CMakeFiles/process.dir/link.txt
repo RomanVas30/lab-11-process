@@ -1,2 +1,0 @@
-/usr/bin/ar qc libprocessd.a  CMakeFiles/process.dir/sources/builder.cpp.o CMakeFiles/process.dir/sources/main.cpp.o
-/usr/bin/ranlib libprocessd.a

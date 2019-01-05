@@ -1,4 +1,0 @@
-/home/vagrant/Labs/lab-11-process/_builds/_CPack_Packages/Linux/TZ/process-0.1.0.0-Linux/lib/libprocessd.a
-/home/vagrant/Labs/lab-11-process/_builds/_CPack_Packages/Linux/TZ/process-0.1.0.0-Linux/include/builder.hpp
-/home/vagrant/Labs/lab-11-process/_builds/_CPack_Packages/Linux/TZ/process-0.1.0.0-Linux/cmake/process-config.cmake
-/home/vagrant/Labs/lab-11-process/_builds/_CPack_Packages/Linux/TZ/process-0.1.0.0-Linux/cmake/process-config-debug.cmake
