@@ -19,6 +19,13 @@ huntergate(
 )
 
 project(process)
+set(PRINT_VERSION_MAJOR 0)
+set(PRINT_VERSION_MINOR 1)
+set(PRINT_VERSION_PATCH 0)
+set(PRINT_VERSION_TWEAK 0)
+set(PRINT_VERSION 
+${PRINT_VERSION_MAJOR}.${PRINT_VERSION_MINOR}.${PRINT_VERSION_PATCH}.${PRINT_VERSION_TWEAK})
+set(PRINT_VERSION_STRING "v${PRINT_VERSION}")
  string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
  string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
  string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
@@ -45,8 +52,9 @@ add_executable(builder
   ${CMAKE_CURRENT_SOURCE_DIR}/sources/main.cpp
 )
 
-target_include_directories(process
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+target_include_directories(process PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
 )
 
 target_include_directories(builder
@@ -56,6 +64,17 @@ target_include_directories(builder
 target_link_libraries(builder GTest::main BoostProcess::boost_process  Boost::program_options Async++::Async++ Boost::iostreams process)
 
 target_link_libraries(process BoostProcess::boost_process Async++::Async++ Boost::program_options Boost::iostreams)
+
+install(TARGETS process
+    EXPORT process-config
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+
+#install(TARGETS process DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/include/)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include)
+install(EXPORT process-config DESTINATION cmake)
 
 enable_testing()
 add_test(NAME unit_tests COMMAND builder)
@@ -69,3 +88,5 @@ if(BUILD_COVERAGE)
   list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/tests/*'")
   coverage_evaluate()
 endif()
+
+include(CPackConfig.cmake)

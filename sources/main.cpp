@@ -1,14 +1,18 @@
 #include <builder.hpp>
 
 #include <iostream>
+#include <thread>
+#include <vector>
+#include <mutex>
+#include <string>
+#include <stdexcept>
+#include <cstdlib>
 
+#include <async++.h>
 #include <boost/process/mitigate.hpp>
 #include <boost/process/initializers.hpp>
 #include <boost/process/execute.hpp>
 #include <boost/process.hpp>
-#include <vector>
-#include <string>
-#include <stdexcept>
 #include <boost/process/wait_for_exit.hpp>
 #include <boost/program_options/cmdline.hpp>
 #include <boost/program_options/config.hpp>
@@ -27,28 +31,76 @@ using namespace boost::process;
 using namespace boost::process::initializers;
 namespace po = boost::program_options;
 
+auto exe_path = search_path("cmake");
+std::mutex m;
+
 bool debug(std::vector<std::string>& args){
-      args.push_back("-H.");
-      args.push_back("-B_builds");
-      args.push_back("-DCMAKE_INSTALL_PREFIX=_install");
-      args.push_back("-DCMAKE_BUILD_TYPE=Debug");
-      auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
-      auto exit_code = wait_for_exit(child);
-      std::cout << "exit process with code: " << exit_code << std::endl;
-      if (exit_code == 0)
-        return true;
-      return false;
+  std::cout << "*--------------------------------------*" << std::endl;
+  std::cout << "|            Сборка: Debug             |" << std::endl;
+  std::cout << "*--------------------------------------*" << std::endl;
+  args.push_back("-H.");
+  args.push_back("-B_builds");
+  args.push_back("-DCMAKE_INSTALL_PREFIX=_install");
+  args.push_back("-DCMAKE_BUILD_TYPE=Debug");
+  auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
+  auto exit_code = wait_for_exit(child);
+  std::cout << "exit process with code: " << exit_code << std::endl;
+  if (exit_code == 0)
+    return true;
+  return false;
 }
 
 bool build(std::vector<std::string>& args) {
   args.push_back("--build");
   args.push_back("_builds");
-  auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-pro$
+  auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
   auto exit_code = wait_for_exit(child);
   std::cout << "exit process with code: " << exit_code << std::endl;
   if (exit_code == 0)
-        return true;
-      return false;
+    return true;
+  return false;
+}
+
+bool install(std::vector<std::string>& args) {
+  std::cout << "*--------------------------------------*" << std::endl;
+  std::cout << "|              Установка               |" << std::endl;
+  std::cout << "*--------------------------------------*" << std::endl;
+  args.push_back("--build");
+  args.push_back("_builds");
+  args.push_back("--target");
+  args.push_back("install");
+  auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
+  auto exit_code = wait_for_exit(child);
+  std::cout << "exit process with code: " << exit_code << std::endl;
+  if (exit_code == 0)
+    return true;
+  return false;
+}
+
+bool pack(std::vector<std::string>& args) {
+  std::cout << "*--------------------------------------*" << std::endl;
+  std::cout << "|              Упаковка                |" << std::endl;
+  std::cout << "*--------------------------------------*" << std::endl;
+  args.push_back("--build");
+  args.push_back("_builds");
+  args.push_back("--target");
+  args.push_back("package");
+  auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
+  auto exit_code = wait_for_exit(child);
+  std::cout << "exit process with code: " << exit_code << std::endl;
+  if (exit_code == 0)
+    return true;
+  return false;
+}
+
+void timer(std::vector<std::string> args){
+  args.push_back(exe_path);
+  bool valid = debug(args);
+  if (valid){
+    args.clear();
+    args.push_back(exe_path);
+    build(args);
+  }
 }
 
 int main(int argc, char* argv[]){
@@ -57,8 +109,8 @@ int main(int argc, char* argv[]){
     desc.add_options()("help", ": выводим вспомогательное сообщение")(
       "config", po::value<std::string>(), ": указываем конфигурацию сборки (по умолчанию Debug)")(
       "install",  ": добавляем этап установки (в директорию _install)")(
-	  "pack", ": добавляем этап упаковки (в архив формата tar.gz)")(
- 	  "timeout", po::value<int>(), ": указываем время ожидания (в секундах)");
+      "pack", ": добавляем этап упаковки (в архив формата tar.gz)")(
+      "timeout", po::value<int>(), ": указываем время ожидания (в секундах)");
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
@@ -69,8 +121,8 @@ int main(int argc, char* argv[]){
       return 0;
     }
 
-    auto exe_path = search_path("cmake");
     std::vector<std::string> args;
+
     if ((!vm.count("config")) && (!vm.count("install")) && (!vm.count("pack")) && (!vm.count("timeout"))) {
       args.push_back(exe_path);
       bool valid = debug(args);
@@ -82,10 +134,25 @@ int main(int argc, char* argv[]){
       return 0;
     }
 
+    if (vm.count("config")) {
+      if (vm["config"].as<std::string>() == "Debug") {
+        args.push_back(exe_path);
+        bool valid = debug(args);
+        if (valid){
+          args.clear();
+          args.push_back(exe_path);
+          build(args);
+        }
+        return 0;
+      }
+    }
 
     if (vm.count("config")) {
       if (vm["config"].as<std::string>() == "Release") {
         args.push_back(exe_path);
+        std::cout << "*--------------------------------------*" << std::endl;
+        std::cout << "|           Сборка: Release            |" << std::endl;
+        std::cout << "*--------------------------------------*" << std::endl;
         args.push_back("-H.");
         args.push_back("-B_builds");
         args.push_back("-DCMAKE_INSTALL_PREFIX=_install");
@@ -102,31 +169,70 @@ int main(int argc, char* argv[]){
       }
     }
 
-    if (vm.count("install")){
+    if ((vm.count("pack")) && (vm.count("install"))) {
       args.push_back(exe_path);
-      args.push_back("-H.");
-      args.push_back("-B_builds");
-      args.push_back("-DCMAKE_INSTALL_PREFIX=_install");
-      args.push_back("-DCMAKE_BUILD_TYPE=Debug");
-      auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
-      auto exit_code = wait_for_exit(child);
-      std::cout << "exit process with code: " << exit_code << std::endl;
-      if (exit_code == 0){
+      bool valid = true;
+      valid = debug(args);
+      if (valid){
         args.clear();
         args.push_back(exe_path);
-        bool valid = build(args);
+        valid = build(args);
       }
       if (valid) {
         args.clear();
         args.push_back(exe_path);
-        args.push_back("--build");
-        args.push_back("_builds");
-        args.push_back("--target");
-        args.push_back("install");
-        child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
-        exit_code = wait_for_exit(child);
-        std::cout << "exit process with code: " << exit_code << std::endl;
+        valid = install(args);
       }
+      if (valid) {
+        args.clear();
+        args.push_back(exe_path);
+        pack(args);
+      }
+      return 0;
+    }
+
+
+    if (vm.count("install")) {
+      args.push_back(exe_path);
+      bool valid = true;
+      valid = debug(args);
+      if (valid){
+        args.clear();
+        args.push_back(exe_path);
+        valid = build(args);
+      }
+      if (valid) {
+        args.clear();
+        args.push_back(exe_path);
+        install(args);
+      }
+      return 0;
+    }
+
+    if (vm.count("pack")) {
+      args.push_back(exe_path);
+      bool valid = true;
+      valid = debug(args);
+      if (valid){
+        args.clear();
+        args.push_back(exe_path);
+        valid = build(args);
+      }
+      if (valid) {
+        args.clear();
+        args.push_back(exe_path);
+        pack(args);
+      }
+      return 0;
+    }
+
+    if (vm.count("timeout")) {
+      int time = vm["timeout"].as<int>();
+      std::thread{&timer, args}.detach();
+      std::this_thread::sleep_for(std::chrono::seconds(time));
+      std::lock_guard<std::mutex> lock(m);
+      std::cout << "TIMEOUT!!!" << std::endl;
+      throw std::runtime_error{ "Timeout!" };
       return 0;
     }
   }
