@@ -31,10 +31,8 @@ using namespace boost::process;
 using namespace boost::process::initializers;
 namespace po = boost::program_options;
 
-auto exe_path = search_path("cmake");
-
-void process(std::vector<std::string>& args) {
-  auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
+void process(const std::vector<std::string>& args) {
+  auto child = execute(set_args(args), inherit_env());
   auto exit_code = wait_for_exit(child);
   std::cout << "exit process with code: " << exit_code << std::endl;
   if (exit_code != 0)
@@ -42,58 +40,54 @@ void process(std::vector<std::string>& args) {
 }
 
 void default_opt(std::vector<std::string>& args){
-  args.clear();
-  args.push_back(exe_path);
-  args.push_back("--build");
-  args.push_back("_builds");
+  args.insert(args.begin() + 1, {"--build",
+                                 "_builds"});
 }
 
-void debug(std::vector<std::string>& args){
+void debug(std::vector<std::string> args){
   std::cout << "o--------------------------------------o" << std::endl;
   std::cout << "|            Сборка: Debug             |" << std::endl;
   std::cout << "o--------------------------------------o" << std::endl;
-  args.push_back(exe_path);
-  args.push_back("-H.");
-  args.push_back("-B_builds");
-  args.push_back("-DCMAKE_INSTALL_PREFIX=_install");
-  args.push_back("-DCMAKE_BUILD_TYPE=Debug");
+  args.insert(args.begin() + 1, {"-H.",
+                                 "-B_builds",
+                                 "-DCMAKE_INSTALL_PREFIX=_install",
+                                 "-DCMAKE_BUILD_TYPE=Debug"});
   process(args);
 }
 
-void release(std::vector<std::string>& args) {
-  args.push_back(exe_path);
+void release(std::vector<std::string> args) {
   std::cout << "o--------------------------------------o" << std::endl;
   std::cout << "|           Сборка: Release            |" << std::endl;
   std::cout << "o--------------------------------------o" << std::endl;
-  args.push_back("-H.");
-  args.push_back("-B_builds");
-  args.push_back("-DCMAKE_INSTALL_PREFIX=_install");
-  args.push_back("-DCMAKE_BUILD_TYPE=Release");
+  args.insert(args.begin() + 1, {"-H.",
+                                 "-B_builds",
+                                 "-DCMAKE_INSTALL_PREFIX=_install",
+                                 "-DCMAKE_BUILD_TYPE=Release"});
   process(args);
 }
 
-void build(std::vector<std::string>& args) {
+void build(std::vector<std::string> args) {
   default_opt(args);
   process(args);
 }
 
-void install(std::vector<std::string>& args) {
+void install(std::vector<std::string> args) {
   std::cout << "o--------------------------------------o" << std::endl;
   std::cout << "|              Установка               |" << std::endl;
   std::cout << "o--------------------------------------o" << std::endl;
   default_opt(args);
-  args.push_back("--target");
-  args.push_back("install");
+  args.insert(args.begin() + 3, {"--target",
+                                 "install"});
   process(args);
 }
 
-void pack(std::vector<std::string>& args) {
+void pack(std::vector<std::string> args) {
   std::cout << "o--------------------------------------o" << std::endl;
   std::cout << "|              Упаковка                |" << std::endl;
   std::cout << "o--------------------------------------o" << std::endl;
   default_opt(args);
-  args.push_back("--target");
-  args.push_back("package");
+  args.insert(args.begin() + 3, {"--target",
+                                 "package"});
   process(args);
 }
 
@@ -130,57 +124,38 @@ int main(int argc, char* argv[]){
     }
 
     std::vector<std::string> args;
+    auto exe_path = search_path("cmake");
+    args.push_back(exe_path);
 
-    if (vm_config) {
+    if (vm_config)
       if (vm["config"].as<std::string>() == "Release") {
-        async::spawn([&args] {
+        async::spawn([args] {
           release(args);
-        }).then([&args] {
+        }).then([args] {
           build(args);
         });
+        return 0;
       }
-      else {
-        async::spawn([&args] {
-          debug(args);
-        }).then([&args] {
-          build(args);
-        });
-      }
-    }
+    auto t1 = async::spawn([args] {
+      debug(args);
+    }).then([args] {
+      build(args);
+    });
     if ((vm_install) && (vm_pack)) {
-      async::spawn([&args] {
-        debug(args);
-      }).then([&args] {
-        build(args);
-      }).then([&args] {
+      auto t2 = t1.then([args] {
         install(args);
-      }).then([&args] {
+      }).then([args] {
         pack(args);
       });
     }
     if ((vm_install) && (!vm_pack)) {
-      async::spawn([&args] {
-        debug(args);
-      }).then([&args] {
-        build(args);
-      }).then([&args] {
+      auto t2 = t1.then([args] {
         install(args);
       });
     }
     if ((!vm_install) && (vm_pack)) {
-      async::spawn([&args] {
-        debug(args);
-      }).then([&args] {
-        build(args);
-      }).then([&args] {
+      auto t2 = t1.then([args] {
         pack(args);
-      });
-    }
-    if ((!vm_config) && (!vm_install) && (!vm_pack) && (!vm_timeout)) {
-      async::spawn([&args] {
-        debug(args);
-      }).then([&args] {
-        build(args);
       });
     }
     if (vm_timeout) {
