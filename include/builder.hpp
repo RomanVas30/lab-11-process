@@ -3,11 +3,4 @@
 #ifndef INCLUDE_BUILDER_HPP_
 #define INCLUDE_BUILDER_HPP_
 
-class Builder{
-public:
-  Builder();
-private:
-
-};
-
 #endif // INCLUDE_BUILDER_HPP_
