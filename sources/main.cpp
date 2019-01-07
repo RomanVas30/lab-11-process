@@ -54,7 +54,6 @@ void generation(std::vector<std::string> args, const std::string& configuration)
                                  "-DCMAKE_INSTALL_PREFIX=_install",
                                  "-DCMAKE_BUILD_TYPE=" + configuration
                                 });
-  
   std::cout << "o--------------------------------------o" << std::endl;
   std::cout << "|            Сборка: " << std::left << std::setw(18) << configuration << "|" << std::endl;
   std::cout << "o--------------------------------------o" << std::endl;
