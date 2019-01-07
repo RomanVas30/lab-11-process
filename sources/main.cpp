@@ -1,5 +1,6 @@
 #include <chrono>
 #include <cstdlib>
+#include <iomanip>
 #include <iostream>
 #include <mutex>
 #include <stdexcept>
@@ -53,18 +54,10 @@ void generation(std::vector<std::string> args, const std::string& configuration)
                                  "-DCMAKE_INSTALL_PREFIX=_install",
                                  "-DCMAKE_BUILD_TYPE=" + configuration
                                 });
-  if (configuration == "Release")
-  {
-    std::cout << "o--------------------------------------o" << std::endl;
-    std::cout << "|           Сборка: Release            |" << std::endl;
-    std::cout << "o--------------------------------------o" << std::endl;
-  }
-  else
-  {
-    std::cout << "o--------------------------------------o" << std::endl;
-    std::cout << "|            Сборка: Debug             |" << std::endl;
-    std::cout << "o--------------------------------------o" << std::endl;
-  }
+  
+  std::cout << "o--------------------------------------o" << std::endl;
+  std::cout << "|            Сборка: " << std::left << std::setw(18) << configuration << "|" << std::endl;
+  std::cout << "o--------------------------------------o" << std::endl;
   process(args);
 }
 

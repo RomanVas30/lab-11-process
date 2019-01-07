@@ -18,14 +18,14 @@ huntergate(
   SHA1 "70287b1ffa810ee4e952052a9adff9b4856d0d54"
 )
 
-project(process)
-set(PRINT_VERSION_MAJOR 0)
-set(PRINT_VERSION_MINOR 1)
-set(PRINT_VERSION_PATCH 0)
-set(PRINT_VERSION_TWEAK 0)
-set(PRINT_VERSION 
-${PRINT_VERSION_MAJOR}.${PRINT_VERSION_MINOR}.${PRINT_VERSION_PATCH}.${PRINT_VERSION_TWEAK})
-set(PRINT_VERSION_STRING "v${PRINT_VERSION}")
+project(builder)
+set(BUILDER_VERSION_MAJOR 0)
+set(BUILDER_VERSION_MINOR 1)
+set(BUILDER_VERSION_PATCH 0)
+set(BUILDER_VERSION_TWEAK 0)
+set(BUILDER_VERSION
+${BUILDER_VERSION_MAJOR}.${BUILDER_VERSION_MINOR}.${BUILDER_VERSION_PATCH}.${BUILDER_VERSION_TWEAK})
+set(BUILDER_VERSION_STRING "v${BUILDER_VERSION}")
  string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
  string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
  string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
@@ -42,51 +42,25 @@ find_package(Async++ CONFIG REQUIRED)
 hunter_add_package(Boost COMPONENTS iostreams program_options)
 find_package(Boost CONFIG REQUIRED iostreams program_options)
 
-add_library(process STATIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/sources/builder.cpp
-  ${CMAKE_CURRENT_SOURCE_DIR}/sources/main.cpp
-)
-
 add_executable(builder
-  ${CMAKE_CURRENT_SOURCE_DIR}/sources/builder.cpp
   ${CMAKE_CURRENT_SOURCE_DIR}/sources/main.cpp
-)
-
-target_include_directories(process PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>
 )
 
 target_include_directories(builder
-  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/
 )
 
-target_link_libraries(builder GTest::main BoostProcess::boost_process  Boost::program_options Async++::Async++ Boost::iostreams process)
+target_link_libraries(builder
+  PUBLIC GTest::main BoostProcess::boost_process Boost::program_options Boost::iostreams Async++::Async++
+)
 
-target_link_libraries(process BoostProcess::boost_process Async++::Async++ Boost::program_options Boost::iostreams)
-
-install(TARGETS process
-    EXPORT process-config
+install(TARGETS builder
+    EXPORT builder-config
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
 
-#install(TARGETS process DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/include/)
-install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION include)
-install(EXPORT process-config DESTINATION cmake)
-
-enable_testing()
-add_test(NAME unit_tests COMMAND builder)
-
-if(BUILD_COVERAGE)
-  set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-  find_package(codecov)
-  add_coverage(process)
-  add_coverage(builder)
-  list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/tests/*'")
-  coverage_evaluate()
-endif()
+install(EXPORT builder-config DESTINATION cmake)
 
 include(CPackConfig.cmake)
