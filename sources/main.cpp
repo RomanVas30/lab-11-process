@@ -34,7 +34,7 @@ namespace po = boost::program_options;
 
 void process(const std::vector<std::string>& args)
 {
-  auto child = execute(set_args(args), inherit_env(), start_in_dir("/home/vagrant/Labs/lab-11-process"));
+  auto child = execute(set_args(args), inherit_env());
   auto exit_code = wait_for_exit(child);
   std::cout << "exit process with code: " << exit_code << std::endl;
   if (exit_code != 0)
